@@ -40,7 +40,7 @@ exports.addMember = async (req, res, next) => {
         res.status(201).json({
             success: true,
             member: {
-                id: user._id,
+                _id: user._id,
                 firstName,
                 email,
                 role,
@@ -111,7 +111,7 @@ exports.updateMember = async (req, res, next) => {
         res.status(200).json({
             success: true,
             member: {
-                id: user._id,
+                _id: user._id,
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email,
