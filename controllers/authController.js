@@ -108,3 +108,18 @@ exports.login = async (req, res, next) => {
     }
 
 };
+
+exports.currentUser = async (req, res, next) => {
+   
+    try {
+        
+        return res.status(200).json({
+            success: true,
+            user: { id: req.user._id, firstName: req.user.firstName, lastName: req.user.lastName, email: req.user.email, role: req.user.role },
+        })
+
+    } catch (error) {
+        next(error);
+    }
+
+};

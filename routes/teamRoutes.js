@@ -27,8 +27,8 @@ router.patch(
     [
         check('firstName', 'First name is required').not().isEmpty(),
         check('email', 'Please include a valid mail').isEmail(),
-        check('password', 'Password must be 6 or more characters').isLength({min : 6}),
-        check('confirmPassword', 'Confirm password is required').exists(),
+        // check('password', 'Password must be 6 or more characters').isLength({min : 6}),
+        // check('confirmPassword', 'Confirm password is required').exists(),
     ],
     updateMember
 );

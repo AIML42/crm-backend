@@ -1,7 +1,7 @@
 const express = require("express");
-const { signup, login } = require("../controllers/authController");
+const { signup, login, currentUser } = require("../controllers/authController");
 const { check } = require("express-validator");
-
+const { protect} = require("../middleware/authMiddleware");
 
 
 const router = express.Router();
@@ -26,6 +26,15 @@ router.post(
         check('password', 'Password is required').exists(),
     ],
     login
+);
+
+
+router.get(
+    '/current-user',
+    [
+        protect
+    ],
+    currentUser
 );
 
 module.exports = router;

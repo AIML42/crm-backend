@@ -74,7 +74,7 @@ exports.updateMember = async (req, res, next) => {
         return res.status(400).json({ success: false, errors: errors.array() });
     }
 
-    const { firstName, lastName, email, password, confirmPassword } = req.body;
+    const { firstName, lastName, email, password, confirmPassword, role } = req.body;
 
     try {
 
@@ -95,6 +95,7 @@ exports.updateMember = async (req, res, next) => {
         user.firstName = firstName || user.firstName;
         user.lastName = lastName || user.lastName;
         user.email = email || user.email;
+        user.role = role || user.role;
 
         // Only update password if provided
         if (password) {
