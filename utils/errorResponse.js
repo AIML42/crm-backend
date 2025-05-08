@@ -1,3 +1,6 @@
+
+// a common response message 
+
 const errorHandler = (err, req, res, next) => {
     console.log(err.stack);
     res.status(err.statusCode || 500).json({
@@ -7,4 +10,6 @@ const errorHandler = (err, req, res, next) => {
 };
 
 module.exports = errorHandler;   
+
+
                                                                                                                                                                                                                                        
