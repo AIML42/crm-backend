@@ -18,6 +18,11 @@ exports.createChat = async (req, res, next) => {
         const config = await ChatbotConfig.findOne({});
         const welcomeMessage = config ? config.customizeMessage : 'Hello! How can I assist you today?';
 
+        const firstAdmin = await User.findOne({ role: 'admin' }).sort({ createdAt: 1 });
+        if (!firstAdmin) {
+            return res.status(400).json({ success: false, message:'No admin' });
+        }
+
         const chat = new Chat({
             userInfo,
             messages: [
@@ -76,10 +81,10 @@ exports.addMessage = async (req, res, next) => {
         let botResponse;
         if (sender === 'user') {
             // we will handle this in future.
-            
+
             // botResponse = await processUserMessage(message, chat._id);
 
-            
+
             // if (botResponse) {
             //     chat.messages.push({
             //         sender: 'bot',
@@ -109,8 +114,8 @@ exports.addMessage = async (req, res, next) => {
 exports.getChats = async (req, res, next) => {
     try {
         // 1. First find all tickets assigned to current user
-        const tickets = await Ticket.find({ 
-            assignedTo: req.user._id 
+        const tickets = await Ticket.find({
+            assignedTo: req.user._id
         }).select('chatId'); // Only get chatId field
 
         // 2. Extract chat IDs from tickets (filtering out any null/undefined)
