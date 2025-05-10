@@ -51,7 +51,7 @@ exports.createTicket = async (req, res, next) => {
 exports.getTickets = async (req, res, next) => {
     try {
         const { status, phone, email } = req.query;
-        const query = {};
+        const query = { assignedTo: req.user._id }; 
 
         if (status && ['resolved', 'unresolved'].includes(status)) {
             query.status = status;
@@ -63,7 +63,9 @@ exports.getTickets = async (req, res, next) => {
             query['userInfo.email'] = { $regex: email, $options: 'i' };
         }
 
-        const tickets = await Ticket.find(query).populate('assignedTo', 'firstName lastName email');
+        const tickets = await Ticket.find(query)
+            .populate('assignedTo', 'firstName lastName email');
+            
         res.status(200).json({
             success: true,
             tickets,
@@ -97,9 +99,16 @@ exports.updateTicket = async (req, res, next) => {
     const { message, status, assignedTo } = req.body;
 
     try {
-        const ticket = await Ticket.findById(req.params.id);
+        let ticket = await Ticket.findById(req.params.id);
         if (!ticket) {
-            return res.status(404).json({ success: false, message: 'Ticket not found' });
+
+            // find by chat id 
+            ticket = await Ticket.findOne({chatId: req.params.id});
+
+            if(!ticket){
+                return res.status(404).json({ success: false, message: 'Ticket not found' });
+            }
+            
         }
 
         if (assignedTo) {

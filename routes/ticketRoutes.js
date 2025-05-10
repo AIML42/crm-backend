@@ -24,7 +24,7 @@ router.get(
     '/',
     [
         protect,
-        admin,
+        // admin,
         check('status', 'Status must be resolved or unresolved').optional().isIn(['resolved', 'unresolved']),
         check('phone', 'Phone must be a string').optional().isString(),
         check('email', 'Email must be valid').optional().isEmail(),
@@ -38,7 +38,7 @@ router.patch(
     '/:id',
     [
         protect,
-        admin,
+        // admin,
         check('message', 'Message must not be empty').optional().not().isEmpty(),
         check('status', 'Status must be resolved or unresolved').optional().isIn(['resolved', 'unresolved']),
         check('assignedTo', 'AssignedTo must be a valid ObjectId').optional().isMongoId(),

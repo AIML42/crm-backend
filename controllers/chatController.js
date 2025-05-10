@@ -16,7 +16,7 @@ exports.createChat = async (req, res, next) => {
 
     try {
         const config = await ChatbotConfig.findOne({});
-        const welcomeMessage = config ? config.welcomeMessage : 'Hello! How can I assist you today?';
+        const welcomeMessage = config ? config.customizeMessage : 'Hello! How can I assist you today?';
 
         const chat = new Chat({
             userInfo,
@@ -26,6 +26,8 @@ exports.createChat = async (req, res, next) => {
             ],
             firstMessageAt: Date.now(),
         });
+
+        await chat.save()
 
         // Process user message
         const botResponse = await processUserMessage(message, chat._id);
@@ -73,14 +75,18 @@ exports.addMessage = async (req, res, next) => {
 
         let botResponse;
         if (sender === 'user') {
-            botResponse = await processUserMessage(message, chat._id);
-            if (botResponse) {
-                chat.messages.push({
-                    sender: 'bot',
-                    content: botResponse,
-                    timestamp: Date.now(),
-                });
-            }
+            // we will handle this in future.
+            
+            // botResponse = await processUserMessage(message, chat._id);
+
+            
+            // if (botResponse) {
+            //     chat.messages.push({
+            //         sender: 'bot',
+            //         content: botResponse,
+            //         timestamp: Date.now(),
+            //     });
+            // }
         }
 
         await chat.save();
@@ -99,10 +105,32 @@ exports.addMessage = async (req, res, next) => {
     }
 };
 
-// Get all chats
+// Get all chats to that particular user
 exports.getChats = async (req, res, next) => {
     try {
-        const chats = await Chat.find({});
+        // 1. First find all tickets assigned to current user
+        const tickets = await Ticket.find({ 
+            assignedTo: req.user._id 
+        }).select('chatId'); // Only get chatId field
+
+        // 2. Extract chat IDs from tickets (filtering out any null/undefined)
+        const chatIds = tickets
+            .map(ticket => ticket.chatId)
+            .filter(chatId => chatId); // Remove null/undefined values
+
+        // 3. If no chats found, return empty array
+        if (chatIds.length === 0) {
+            return res.status(200).json({
+                success: true,
+                chats: []
+            });
+        }
+
+        // 4. Find all chats referenced by these tickets
+        const chats = await Chat.find({
+            _id: { $in: chatIds }
+        }).populate('userInfo', 'firstName lastName email phone');
+
         res.status(200).json({
             success: true,
             chats,
@@ -146,7 +174,7 @@ async function processUserMessage(message, chatId) {
 
     // Use customizeMessage before escalating
     await createTicketFromChat(chatId, message);
-    return config.customizeMessage;
+    return 'Your query has been escalated to our support team.';
 }
 
 // Helper: Create ticket from chat

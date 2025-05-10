@@ -26,8 +26,8 @@ router.post(
     addMessage
 );
 
-router.get('/', [protect, admin], getChats);
+router.get('/', [protect], getChats);
 
-router.get('/:id', [protect, admin], getChatById);
+router.get('/:id', getChatById);
 
 module.exports = router;
